@@ -1,0 +1,38 @@
+# Flutter/Dart/Pub related files
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+/build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-versions
+.swp
+android/.gradle/
+android/app/google-services.json
+android/key.properties
+android/local.properties
+ios/Flutter/Flutter.podspec
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Runner.xcodeproj/project.xcworkspace/
+ios/Runner.xcodeproj/xcuserdata/
+ios/.symlinks/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
+macos/Pods/
+macos/Flutter/ephemeral/
+web/manifest.json
+
+# Obsolete files
+*.lock
+*.log
+
+# JetBrains related files
+.idea/
+*.iml
+
+# VS Code related files
+.vscode/
+*.code-workspace
