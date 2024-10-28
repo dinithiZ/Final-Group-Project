@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:cassava_healthy_finder/services/auth_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+
+//git config --global user.email "you@example.com"
+//git config --global user.name "Your Name"
+
 class ChangePasswordScreen extends StatefulWidget {
   @override
   _ChangePasswordScreenState createState() => _ChangePasswordScreenState();
