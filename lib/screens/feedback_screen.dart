@@ -23,10 +23,14 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         backgroundColor: Color.fromARGB(255, 218, 227, 219),
         title: const Text(
           'Feedback Form',
-          style: TextStyle(fontSize: 25,color: Color.fromARGB(255, 13, 59, 20),),
+          style: TextStyle(
+            fontSize: 25,
+            color: Color.fromARGB(255, 13, 59, 20),
+          ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: const Color.fromARGB(255, 17, 17, 17)),
+          icon: Icon(Icons.arrow_back,
+              color: const Color.fromARGB(255, 17, 17, 17)),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -45,25 +49,32 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   color: Color.fromARGB(255, 224, 237, 224),
                 ),
               ),
-              SizedBox(height: 30
-              ),
+              SizedBox(height: 30),
               TextFormField(
                 decoration: InputDecoration(
                   labelText: 'Name',
-                  prefixIcon: Icon(Icons.person, color: Color.fromARGB(255, 224, 237, 224)),
+                  prefixIcon: Icon(Icons.person,
+                      color: Color.fromARGB(255, 224, 237, 224)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
                   fillColor: Colors.white,
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Name is required';
+                  }
+                  return null;
+                },
                 onSaved: (value) => _name = value ?? '',
               ),
               SizedBox(height: 16),
               TextFormField(
                 decoration: InputDecoration(
                   labelText: 'Email Address',
-                  prefixIcon: Icon(Icons.email, color: const Color.fromARGB(255, 10, 49, 12)),
+                  prefixIcon: Icon(Icons.email,
+                      color: const Color.fromARGB(255, 10, 49, 12)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -71,6 +82,17 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   fillColor: Colors.white,
                 ),
                 keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Email is required';
+                  }
+                  // Regular expression for validating email format
+                  final emailRegEx = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                  if (!emailRegEx.hasMatch(value)) {
+                    return 'Please enter a valid email address';
+                  }
+                  return null;
+                },
                 onSaved: (value) => _email = value ?? '',
               ),
               SizedBox(height: 16),
@@ -105,6 +127,15 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   fillColor: Colors.white,
                 ),
                 maxLines: 4,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your comments';
+                  }
+                  if (value.length > 250) {
+                    return 'Comments cannot exceed 250 characters';
+                  }
+                  return null;
+                },
                 onSaved: (value) => _comment = value ?? '',
               ),
               SizedBox(height: 24),
@@ -115,7 +146,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     onPressed: () => Navigator.of(context).pop(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 195, 42, 42),
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -133,7 +165,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     onPressed: _submitForm,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 17, 83, 20),
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
