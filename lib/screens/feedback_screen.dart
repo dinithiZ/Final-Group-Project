@@ -11,7 +11,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   String _name = '';
   String _email = '';
   String _comment = '';
-  int _rating = 0;
+  int _rating = 0; // Rating should be 1-5; 0 indicates no rating selected
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -86,7 +86,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Email is required';
                   }
-                  // Regular expression for validating email format
                   final emailRegEx = RegExp(r'^[^@]+@[^@]+\.[^@]+');
                   if (!emailRegEx.hasMatch(value)) {
                     return 'Please enter a valid email address';
@@ -115,6 +114,14 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   );
                 }),
               ),
+              if (_rating == 0) // Display error message if no rating selected
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    'Please select a rating.',
+                    style: TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
               SizedBox(height: 16),
               TextFormField(
                 decoration: InputDecoration(
@@ -190,7 +197,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   }
 
   void _submitForm() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate() && _rating > 0) {
       _formKey.currentState!.save();
 
       try {
@@ -212,6 +219,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           SnackBar(content: Text('Error submitting feedback: $e')),
         );
       }
+    } else if (_rating == 0) {
+      setState(() {}); // Trigger the UI update to show the rating error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please select a rating.')),
+      );
     }
   }
 }
