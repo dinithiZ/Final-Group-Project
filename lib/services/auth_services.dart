@@ -12,9 +12,11 @@ class AuthService {
   User? get currentUser => _auth.currentUser;
 
   // Sign up method
-  Future<UserCredential?> signUp(String name, String email, String password) async {
+  Future<UserCredential?> signUp(
+      String name, String email, String password) async {
     try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -28,7 +30,7 @@ class AuthService {
 
       return userCredential;
     } on FirebaseAuthException catch (e) {
-      print(e.message);
+      print("Sign up error: ${e.message}");
       return null;
     }
   }
@@ -42,9 +44,23 @@ class AuthService {
       );
       return userCredential;
     } on FirebaseAuthException catch (e) {
-      print(e.message);
+      print("Sign in error: ${e.message}");
       return null;
     }
+  }
+
+  // Check if an email is registered
+  Future<bool> isEmailRegistered(String email) async {
+    final querySnapshot = await _firestore
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .get();
+    return querySnapshot.docs.isNotEmpty;
+  }
+
+  // Send password reset email
+  Future<void> sendPasswordResetEmail(String email) async {
+    await _auth.sendPasswordResetEmail(email: email);
   }
 
   // Delete account method
@@ -52,7 +68,7 @@ class AuthService {
     try {
       await _firestore.collection('users').doc(_auth.currentUser?.uid).delete();
       await _auth.currentUser?.delete();
-      print("Account was Deleted");
+      print("Account was deleted");
     } catch (e) {
       print("Error deleting account: $e");
       rethrow;
@@ -65,7 +81,8 @@ class AuthService {
   }
 
   // Update user profile method
-  Future<void> updateUserProfile(String userId, Map<String, dynamic> data) async {
+  Future<void> updateUserProfile(
+      String userId, Map<String, dynamic> data) async {
     try {
       await _firestore.collection('users').doc(userId).update(data);
 
@@ -85,7 +102,8 @@ class AuthService {
   }
 
   // Change password method
-  Future<void> changePassword(String currentPassword, String newPassword) async {
+  Future<void> changePassword(
+      String currentPassword, String newPassword) async {
     final user = _auth.currentUser;
 
     if (user != null) {
