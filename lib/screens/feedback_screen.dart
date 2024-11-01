@@ -11,7 +11,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   String _name = '';
   String _email = '';
   String _comment = '';
-  int _rating = 0; // Rating should be 1-5; 0 indicates no rating selected
+  int _rating = 0; // Rating from 1 to 5
+  bool _isSubmitted = false; // Tracks if the user has attempted to submit
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -39,7 +40,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
                 'We value your feedback!',
@@ -48,6 +49,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   fontWeight: FontWeight.bold,
                   color: Color.fromARGB(255, 224, 237, 224),
                 ),
+                textAlign: TextAlign.center,
               ),
               SizedBox(height: 30),
               TextFormField(
@@ -104,6 +106,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 ),
               ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(5, (index) {
                   return IconButton(
                     icon: Icon(
@@ -114,12 +117,14 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   );
                 }),
               ),
-              if (_rating == 0) // Display error message if no rating selected
+              // Display error message only after user attempts to submit
+              if (_isSubmitted && _rating == 0)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: Text(
                     'Please select a rating.',
                     style: TextStyle(color: Colors.red, fontSize: 14),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               SizedBox(height: 16),
@@ -149,41 +154,44 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 195, 42, 42),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 195, 42, 42),
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: _submitForm,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 17, 83, 20),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _submitForm,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 17, 83, 20),
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      'Submit',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                      child: Text(
+                        'Submit',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
@@ -197,6 +205,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   }
 
   void _submitForm() async {
+    setState(() {
+      _isSubmitted =
+          true; // Mark form as submitted to show validation errors if any
+    });
+
     if (_formKey.currentState!.validate() && _rating > 0) {
       _formKey.currentState!.save();
 
@@ -209,21 +222,31 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           'timestamp': FieldValue.serverTimestamp(),
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Feedback submitted successfully')),
+        // Show confirmation dialog
+        await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Thank you for your feedback!'),
+            content: Text(
+                'We appreciate your input and will use it to improve our services.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close dialog
+                  Navigator.of(context).pop(); // Go back to previous screen
+                },
+                child: Text('OK'),
+              ),
+            ],
+          ),
         );
-
-        Navigator.of(context).pop();
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error submitting feedback: $e')),
         );
       }
     } else if (_rating == 0) {
-      setState(() {}); // Trigger the UI update to show the rating error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please select a rating.')),
-      );
+      // Rating error is already handled in the UI and by _isSubmitted flag
     }
   }
 }
